@@ -10,13 +10,13 @@ intents.presences = False
 class myBot(commands.Bot):
     async def on_ready(self):
         await self.wait_until_ready()
-        print(f'Logged in as {self.user}!')
+        print(f'Logget inn som {self.user}!')
 
         self.loop.create_task(update_embed())
         
         try:
             synced = await self.tree.sync()
-            print(f'Synced {len(synced)} Command(s)')
+            print(f'Synkroniserte {len(synced)} Kommando(er)')
         except Exception as e:
             print('e: {}'.format(e))
 
@@ -56,25 +56,25 @@ async def update_embed():
             status_indicator = status_data.get('status', {}).get('indicator')
 
             if status_indicator == 'none':
-                status_text = 'All Systems Operational'
+                status_text = 'Alle Systemer I Drift'
                 status_emoji = ':green_circle:'
                 embed_color, emoji = 6205745, '🟢'
                 if downtime_start and downtime_end:
                     downtime_duration = (downtime_end - downtime_start).total_seconds() // 60
-                    mention_message = f"@everyone CFX is back online after {downtime_duration} minutes of downtime. All operations are normal now."
+                    mention_message = f"@here CFX er tilbake i drift etter {downtime_duration} minutter med nedetid. Alle systemer er tilbake i drift."
                     downtime_start = None
                     downtime_end = None
                     await channel.send(mention_message)
             else:
-                status_text = 'Experiencing Issues'
+                status_text = 'Opplever Problemer'
                 status_emoji = ':orange_circle:'
                 embed_color, emoji = 16711680, '🔴'
                 if not downtime_start:
                     downtime_start = datetime.now()
-                    mention_message = f"@everyone CFX is currently facing issues and is not accessible. Please stay patient."
+                    mention_message = f"@here CFX opplever for tiden problemer og vil ikke være tilgjengelig for alle. Vennligst vær tålmodig."
                     await channel.send(mention_message)
 
-            embed = discord.Embed(title="CFX Status", color=embed_color)
+            embed = discord.Embed(title="🐌 CFX Status", color=embed_color)
             embed.add_field(name="API Status", value=f"{status_emoji} {status_text}")
 
             component_lines = []
@@ -85,10 +85,10 @@ async def update_embed():
                 component_line = f"{component_emoji} **{component_name}**: {component_status}"
                 component_lines.append(component_line)
 
-            embed.add_field(name="Component Status", value='\n'.join(component_lines), inline=False)
+            embed.add_field(name="System Status", value='\n'.join(component_lines), inline=False)
 
             current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            embed.set_footer(text=f"Last updated at: {current_time}")
+            embed.set_footer(text=f"Sist Oppdatert: {current_time}")
 
             if channel:
                 if EDIT_CHANNEL:
@@ -112,7 +112,7 @@ async def update_embed():
                     new_message = await channel.send(embed=embed)
                     last_message_id = new_message.id
         except Exception as e:
-            print(f"An error occurred: {str(e)}")
+            print(f"En feil oppstod: {str(e)}")
 
         await asyncio.sleep(REFRESH_INTERVAL)
 
@@ -121,8 +121,8 @@ async def on_command_error(ctx, error):
     if isinstance(error, commands.CommandNotFound):
         return
     elif isinstance(error, commands.MissingRequiredArgument):
-        await ctx.send('Please provide all the required arguments.')
+        await ctx.send('Vennligst oppgi alle nødvendige argumenter.')
     else:
-        await ctx.send('An error occurred while executing the command.')
+        await ctx.send('Det oppsto en feil under utførelse av kommandoen.')
 
 bot.run(TOKEN)
